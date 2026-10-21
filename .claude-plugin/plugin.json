@@ -1,0 +1,6 @@
+{
+  "name": "context-meter",
+  "version": "0.2.1",
+  "description": "입력창 아래 한 줄에 콘텍스트 저하 구간과 사용량 한도를 보여 주는 미터",
+  "types": "./types/index.d.ts"
+}

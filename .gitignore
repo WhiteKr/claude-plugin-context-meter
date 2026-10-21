@@ -1,0 +1,19 @@
+node_modules/
+
+# Local Claude Code settings and sandbox mount points
+.claude/
+
+# Editor settings
+.idea
+.vscode
+
+# Sandbox mount points (not project files)
+.bash_profile
+.bashrc
+.gitconfig
+.gitmodules
+.mcp.json
+.profile
+.ripgreprc
+.zprofile
+.zshrc
