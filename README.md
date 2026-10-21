@@ -8,7 +8,7 @@ Claude Code 입력창에 한 줄짜리 미터를 그리는 플러그인입니다
 터미널 세션의 입력창에서 다음을 입력합니다.
 
 ```
-/plugin install context-meter --marketplace WhiteKr/claude-context-meter
+/plugin install context-meter --marketplace WhiteKr/whitekr-claude-plugins
 ```
 
 `Add marketplace?`에 `y`로 답하고 설치 범위를 고릅니다.
@@ -16,7 +16,7 @@ Claude Code 입력창에 한 줄짜리 미터를 그리는 플러그인입니다
 셸에서 설치하려면 다음을 실행합니다.
 
 ```bash
-claude plugin install context-meter --marketplace WhiteKr/claude-context-meter
+claude plugin install context-meter --marketplace WhiteKr/whitekr-claude-plugins
 ```
 
 ## 기능
