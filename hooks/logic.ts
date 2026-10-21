@@ -131,24 +131,15 @@ export const fmtPercent = (n: number): string =>
 
 export type Hint = { text: string; tone: 'dim' | Level }
 
-// One slot of text beside the context ring: the most urgent fact wins.
+// One slot of text beside the context ring: the most urgent fact about the
+// context wins. Limit forecasts sit beside their own limits, in the open meter.
 export const pickHint = (args: {
   tokens?: number
   bounds: number[]
   growth: number | null
   autoCompactAt?: number
-  limits: LimitView[]
 }): Hint | null => {
-  const { tokens, bounds, growth, autoCompactAt, limits } = args
-  const running = limits
-    .filter(l => l.exhaustInMs !== undefined)
-    .sort((a, b) => (a.exhaustInMs ?? 0) - (b.exhaustInMs ?? 0))[0]
-  if (running?.exhaustInMs !== undefined) {
-    return {
-      text: `${running.label} 이 속도면 ${fmtDuration(running.exhaustInMs)} 후 소진`,
-      tone: running.level,
-    }
-  }
+  const { tokens, bounds, growth, autoCompactAt } = args
   if (tokens === undefined) return null
 
   const toCompact =

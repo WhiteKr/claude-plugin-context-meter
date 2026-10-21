@@ -81,14 +81,11 @@ test('a limit burning faster than its window warns before it runs low', async ()
 
 test('the hint slot shows the most urgent fact', async () => {
   const bounds = zoneBounds(1_000_000)
-  const limits = [
-    limitView({ kind: 'five_hour', percentUsed: 60, resetsAt: new Date(NOW + 4 * HOUR).toISOString() }, NOW),
-  ]
-  expect(pickHint({ tokens: 50_000, bounds, growth: null, limits })?.text).toBe('5h 이 속도면 40분 후 소진')
-  expect(pickHint({ tokens: 310_000, bounds, growth: null, limits: [] })?.text).toBe('저하 시작 · 압축 권장')
-  expect(pickHint({ tokens: 90_000, bounds, growth: 5000, limits: [] })?.text).toBe('약 2턴 후 양호')
+  expect(pickHint({ tokens: 50_000, bounds, growth: null })?.text).toBe('최적')
+  expect(pickHint({ tokens: 310_000, bounds, growth: null })?.text).toBe('저하 시작 · 압축 권장')
+  expect(pickHint({ tokens: 90_000, bounds, growth: 5000 })?.text).toBe('약 2턴 후 양호')
   expect(
-    pickHint({ tokens: 300_000, bounds, growth: 20_000, autoCompactAt: 340_000, limits: [] })?.text,
+    pickHint({ tokens: 300_000, bounds, growth: 20_000, autoCompactAt: 340_000 })?.text,
   ).toBe('약 2턴 후 자동 압축')
 })
 
@@ -145,6 +142,26 @@ test('on the terminal the whole meter stays under the prompt', async ($, on) => 
   expect(await hint.find({ key: 'compact' })).toBeUndefined()
   await hint.unmount()
   await band.unmount()
+})
+
+test('a limit forecast shows beside its limit only in the open meter', async ($, on) => {
+  on('session.measure', (_, e) => ({ changed: e.changed }))
+  on('clock.now', () => ({ value: NOW }))
+  await $.session.measure({
+    context: { tokens: 50_000, window: 1_000_000, percent: 5 },
+    rateLimits: [
+      { kind: 'five_hour', percentUsed: 60, resetsAt: new Date(NOW + 4 * HOUR).toISOString() },
+    ],
+    changed: ['context', 'rateLimits'],
+  })
+
+  const ui = await $.ui.mount({ ...BAND, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /소진/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^최적$/ })).toBeDefined()
+
+  await ui.press({ key: 'toggle' })
+  expect((await ui.find({ type: 'Text', text: /소진/ }))?.text).toBe('40m 후 소진')
+  await ui.unmount()
 })
 
 // Stands in for the engine: usage and measurements report `context.tokens`.

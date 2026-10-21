@@ -109,7 +109,7 @@ const readMeter = async ($: EngineInterface) => {
     .map(rl => limitView(rl, now))
   const tokens = s.tokens
   const zone = tokens === undefined ? 0 : zoneOf(tokens, bounds)
-  const hint = pickHint({ tokens, bounds, growth, autoCompactAt: d?.autoCompactAt, limits })
+  const hint = pickHint({ tokens, bounds, growth, autoCompactAt: d?.autoCompactAt })
 
   return { s, d, open: await read($, isOpen), growth, bounds, limits, tokens, zone, hint }
 }
@@ -170,6 +170,9 @@ const meterRow = (
         {v.resetInMs !== undefined && !isNarrow && (
           <Text dimColor tabular>{fmtShortDuration(v.resetInMs)}</Text>
         )}
+        {open && v.exhaustInMs !== undefined && !isNarrow && (
+          <Text color={color} tabular>{fmtShortDuration(v.exhaustInMs)} 후 소진</Text>
+        )}
       </Box>
     )
   }
@@ -200,7 +203,7 @@ const meterPanel = (
   isWorking: boolean,
 ) => {
   const { Box, Text, Button } = ui
-  const { s, d, growth, bounds, limits, tokens, zone } = m
+  const { s, d, growth, bounds, tokens, zone } = m
   const used = d?.categories ?? []
   const toNext =
     tokens !== undefined && zone < bounds.length
@@ -250,20 +253,6 @@ const meterPanel = (
         <Text dimColor wrap="truncate-end">
           {used.slice(0, 3).map(c => `${c.name} ${fmtTokens(c.tokens)}`).join(' · ')}
         </Text>
-      )}
-      {limits.length > 0 && (
-        <Box flexDirection="row" gap="lg">
-          {limits.map(v => (
-            <Text wrap="truncate-end">
-              <Text dimColor>{v.label} </Text>
-              {v.exhaustInMs !== undefined ? (
-                <Text color={LEVEL_THEME[v.level]}>{fmtDuration(v.exhaustInMs)} 후 소진</Text>
-              ) : (
-                <Text dimColor>{v.resetInMs !== undefined ? `${fmtDuration(v.resetInMs)} 후 리셋` : '리셋 시각 모름'}</Text>
-              )}
-            </Text>
-          ))}
-        </Box>
       )}
     </Box>
   )
